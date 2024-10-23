@@ -6,8 +6,7 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-export const uploadOnCloudinaryImage = async (localFilePath) => {
+const uploadOnCloudinaryImage = async (localFilePath) => {
     try {
         if (!localFilePath) {
             return new Error("localFilePath not found");
@@ -26,4 +25,6 @@ export const uploadOnCloudinaryImage = async (localFilePath) => {
         return null;
     }
 };
+
+export { uploadOnCloudinaryImage };
       
