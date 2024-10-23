@@ -30,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.files?.avatar[0].path;
     const coverImageLocalPath = req.files?.coverImage[0].path;
 
-    if (!avatarLocalPath) {
+     if (!avatarLocalPath) {
         throw new ApiError(400, "Please add avatar and cover image")
     }
 
@@ -50,7 +50,7 @@ const registerUser = asyncHandler(async (req, res) => {
         coverImage: coverImage?.url || null
     })
 
-    const createdUser = await User.findById(user._id).select(
+   const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     );
 
