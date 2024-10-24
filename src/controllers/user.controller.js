@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import {uploadOnCloudinaryImage} from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details from frontend
@@ -207,6 +208,7 @@ const refreshUser = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new ApiError(400, error?.message || "Invalid refresh token")
     }
+    
 })
 
 const changeCurrentUserPassword = asyncHandler(async (req, res) => {
