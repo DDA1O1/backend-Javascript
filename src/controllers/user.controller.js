@@ -69,8 +69,91 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
+const loginUser = asyncHandler(async (req, res) => {
+    // req body-> data
+    // username or email
+    // find user
+    // check password
+    // access and refresh token
+    // send cookies
+
+    const {email, username, password} = req.body;
+
+    if (!username && !email) {
+        throw new ApiError(400, "Please add username or email")
+    }
+
+    // if (!username || !email) {
+    //     throw new ApiError(400, "Please add username or email")
+    // }
+
+    const user = await User.findOne({$or: [{email}, {username}]})
+
+    if (!user) {
+        throw new ApiError(400, "User not found")
+    }
+
+    const isPasswordMatched = await user.isPasswordMatched(password);
+
+    if (!isPasswordMatched) {
+        throw new ApiError(400, "Invalid credentials")
+    }
+
+    const access_token = await user.generateAccessToken();
+    const refresh_token = await user.generateRefreshToken();
+
+    if (!access_token || !refresh_token) {
+        throw new ApiError(400, "Access token or refresh token not generated")
+    }
+
+    res.cookie("access_token", access_token, {
+        httpOnly: true,
+        secure: true,
+    })
+    res.cookie("refresh_token", refresh_token, {
+        httpOnly: true,
+        secure: true,
+    })
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                access_token,
+                refresh_token,
+                username: user.username,
+                fullname: user.fullname,
+                email: user.email
+            },
+            "User logged in"
+        )
+    )
+    })
+
+const logoutUser = asyncHandler(async (req, res) => {
+    // delete cookies
+    // send response
+    await User.findOneAndUpdate({_id: req.user._id}, {
+        refreshToken: "",
+    }, {
+        new: true
+    })
+    .then((user) => {
+        if (!user) {
+            throw new ApiError(400, "User not found")
+        }
+        res.clearCookie("access_token")
+        res.clearCookie("refresh_token")
+        res.status(200).json(
+            new ApiResponse(200, null, "User logged out")
+        )
+    })
+})
+
 
 
 export {
-    registerUser
+    registerUser,
+    loginUser,
+    logoutUser
 }
